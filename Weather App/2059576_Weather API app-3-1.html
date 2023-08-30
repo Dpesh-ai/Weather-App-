@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather API</title>
+    
+</head>
+<link rel="preconnect" href="https://fonts.googleapis.com"> 
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Yomogi&display=swap" rel="stylesheet">
+
+
+<script>
+    function generate(){ 
+
+    //Getting the value from the search box
+    var city_name_srch = document.getElementById("s_city").value
+
+    // When the data is already on local storage
+    if(localStorage.when != null && parseInt(localStorage.when) + 30000 > Date.now() && localStorage.city == city_name_srch) {
+        
+        console.log("Data from storage")
+
+        // This function helps us capitalize the first word of the string
+        function capitalize(s){
+            return s[0].toUpperCase() + s.slice(1).toLowerCase();
+        }
+        
+        var city = localStorage.city
+        // the city name in local storage can be saved in non_standard way of English words so using capitalize function for better view of the word
+        city = capitalize(city)
+
+        // Inserting the data from localstorage to the body's elements to show in the browser
+        document.querySelector(".Img").innerHTML = '<img class = "img" src='+"http://openweathermap.org/img/w/" +localStorage.image_icon+ ".png"+'>'
+        document.querySelector(".temp").innerHTML =  localStorage.temp
+        document.querySelector(".M_t").innerHTML = "Maximum temp: " + localStorage.max_temp
+        document.querySelector(".Mn_t").innerHTML = "Minimun temp: " + localStorage.min_temp
+        document.querySelector(".Humidity").innerHTML = "Humidity: " + localStorage.humidity
+        document.querySelector(".Weather_t").innerHTML = localStorage.weatherType_des
+        document.querySelector(".Wind_s").innerHTML = "Wind Speed: " + localStorage.wind_S
+        document.querySelector(".feels_l").innerHTML = "Feels like: " + localStorage.feels_l
+        document.querySelector(".visibility").innerHTML = "Visibility: " + localStorage.visibility
+        document.getElementById('city').innerHTML = "Weather in " + city
+    }
+
+
+    //Fresh data from the API
+    else{
+        console.log("Fresh Data")
+
+        var url = 'http://localhost/Prototype3/indexx-1.php?city=' + city_name_srch
+        fetch(url)
+        .then(response => response.json())
+        .then(response => {
+            
+        // console.log(Date.now())
+
+        // Getting the elements ready for use.       
+            var temp = (response[0].temp ) + " °C"
+            var max_temp = (response[0].max_temp ) + " °C"
+            var min_temp = (response[0].min_temp ) + " °C"
+            var humidity = (response[0].humidity) + "%"
+            var wind_S = Math.ceil((response[0].wind_s)*3.6) + " km/hr"
+            var weatherType_des = response[0].temp_desc
+            var weatherType_img = response[0].image_icon
+            var feels_l = (response[0].feels_like ) + " °C"
+            var visib = (response[0].visibility)/1000 + " km"
+            var city = response[0].city
+
+        // Inserting the data to the body's elements to show in the browser
+        document.querySelector(".Img").innerHTML = '<img class = "img" src='+"http://openweathermap.org/img/w/" + weatherType_img + ".png"+'>'
+        document.querySelector(".temp").innerHTML =  temp
+        document.querySelector(".M_t").innerHTML = "Maximum temp: " + max_temp
+        document.querySelector(".Mn_t").innerHTML = "Minimun temp: " + min_temp
+        document.querySelector(".Humidity").innerHTML = "Humidity: " + humidity
+        document.querySelector(".Weather_t").innerHTML = weatherType_des
+        document.querySelector(".Wind_s").innerHTML = "Wind Speed: " + wind_S
+        document.querySelector(".feels_l").innerHTML = "Feels like: " + feels_l
+        document.querySelector(".visibility").innerHTML = "Visibility: " + visib
+        document.getElementById('city').innerHTML = "Weather in " + city
+
+
+        //Clearing the storage first then storing the data
+        localStorage.clear()
+
+
+        //Storing the data in localstorage
+        localStorage.image_icon = weatherType_img
+        localStorage.temp = temp
+        localStorage.max_temp = max_temp
+        localStorage.min_temp = min_temp
+        localStorage.humidity = humidity
+        localStorage.wind_S = wind_S
+        localStorage.weatherType_des = weatherType_des
+        localStorage.feels_l = feels_l
+        localStorage.visibility = visib
+        localStorage.city = city_name_srch
+        localStorage.when = Date.now()
+
+
+        })
+        .catch(err =>{
+            // Displays errors in console
+            console.log(err)
+
+            // Alerts the user when they input wrong data in the search box
+            alert("The input city's weather cannot be found.")
+
+    })
+    }
+
+  
+}
+</script>
+
+<body onload = "generate()">  
+
+
+<div class="box"> 
+
+    <div class="Search">
+        <input type="text" placeholder="City Name" id="s_city" value="Southampton">
+        <button onclick="generate()">Search</button>
+    </div>
+    <br>
+
+    <h1 id='city'></h1>
+    <br>
+
+    
+
+    <br>
+
+<div class="weather">
+    
+        <h1><div class = "temp">
+                ...
+        </div>
+        </h1>
+    
+        <br>
+        <div class="Img">
+        </div>
+    
+       <h2> <div class = "Weather_t">
+            ... 
+        </div>
+        </h2>
+
+
+  
+        <h2><div class = "feels_l">
+            ... 
+        </div>
+        </h2>
+
+    
+        <h2><div class = "M_t">
+            ...
+        </div>
+        </h2>
+    
+
+    
+        <h2><div class = "Mn_t">
+            ...
+        </div>
+        </h2>
+    
+
+    
+        <h2><div class = "Humidity">
+            ...
+        </div>
+        </h2>
+    
+
+    
+        <h2><div class = "Wind_s">
+            ... 
+        </div>
+        </h2>
+    
+
+
+        <h2><div class = "visibility">
+            ... 
+        </div>
+        </h2>
+
+    
+
+</div>
+</div> 
+</body>
+
+<style>
+    body {
+    display: flex;
+    background: #2222;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: 'Dancing Script', cursive;
+    background-image: url("https://source.unsplash.com/gtdsIafBdIU/1500x800");
+}
+
+.box {color:azure;
+    background-color: inherit;
+    padding: 2em;
+    border-radius: 45px;
+    margin: 1em;
+    width: 100%;
+    max-width: 500px;
+    }
+    
+h1 {
+    font-size: 2.8em;
+    margin: 0;
+}
+.weather {
+    text-transform: capitalize;
+    text-align: center;
+    
+}
+.Img {
+    display: flex;
+    justify-content: center;
+}
+.M_t {
+    text-align: justify;
+}
+
+.Mn_t {
+    text-align: justify;
+}
+
+.Humidity {
+    text-align: justify
+}
+
+.Wind_s{
+    text-align: justify;
+}
+
+.feels_l{
+    text-align: justify;
+}
+
+.visibility{
+text-align: justify;
+}
+
+
+input#s_city {
+    padding: 8px;
+}
+
+.Search {
+    margin-left: 105px;
+    display: inline-block;
+    display: flex;
+}
+
+input#s_city {
+    border-radius: 15px;
+}
+
+button {
+    border-radius: 15px;
+    margin-left: 20px;
+}
+
+button:hover{
+
+    background-color: grey;
+}
+</style>
+
+</html>
